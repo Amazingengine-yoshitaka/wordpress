@@ -1,0 +1,43 @@
+version: '3'
+services:
+  web:
+    build: ./web
+    volumes:
+      - ./app:/var/www/html
+      - ./web/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  https-portal:
+    image: steveltn/https-portal:1
+    container_name: https_portal
+    ports:
+      - "80:80"
+      - "443:443"
+    tty: true
+    restart: always
+    volumes:
+      - ./Certs:/var/lib/https-portal
+    environment:
+      DOMAINS: "${WEB_DOMAIN} -> http://web:80"
+      STAGE: "${HTTPS_PORTAL_STAGE}"
+      CLIENT_MAX_BODY_SIZE: 20M
+      FORCE_RENEW: "${HTTPS_PORTAL_FORCE_RENEW}"
+    depends_on:
+      - web
+
+  app:
+    image: wordpress:${DOCKER_IMAGE_WORDPRESS_VERSION}-php${DOCKER_IMAGE_WORDPRESS_PHP_VERSION}-fpm-alpine
+    depends_on:
+      - db
+    volumes:
+      - ./app:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+    env_file: .db.env
+
+  db:
+    image: mariadb
+    volumes:
+      - ./db-data:/var/lib/mysql
+    container_name: mysql
+    env_file: .db.env
