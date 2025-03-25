@@ -1,0 +1,18 @@
+```
+git clone https://github.com/Amazingengine-yoshitaka/wordpress.git
+cd ~/wordpress
+
+cp example.env .env
+cp example.db.env .db.env
+
+vim .env
+WEB_DOMAIN=example.com
+
+vim .db.env
+# any environment variable
+MARIADB_ROOT_PASSWORD=secretrootpw00000002
+
+MARIADB_DATABASE=wordpress
+MARIADB_USER=wp_user
+MARIADB_PASSWORD=secretpw00000001
+```
